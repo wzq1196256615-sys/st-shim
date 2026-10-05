@@ -1,0 +1,27 @@
+# Render Blueprint：把 st-shim 一键部署成一个免费 Web 服务
+#
+# 用法（二选一）：
+#   A) 控制台 New → Blueprint，选中本仓库，Render 会读这个文件自动建服务
+#   B) 直接用 API 建服务（deploy_render.mjs 脚本），本文件仅供参考
+#
+# 建好后要设的环境变量见 README 第八节；PROFILES_JSON 由控制台「保存到云端」自动写入。
+
+services:
+  - type: web
+    name: st-shim
+    runtime: python
+    plan: free
+    region: oregon
+    branch: main
+    autoDeploy: "no"
+    buildCommand: "python -m py_compile st_shim.py st_shim_web.py"
+    startCommand: "python st_shim_web.py"
+    healthCheckPath: /healthz
+    envVars:
+      # 控制台口令：公网必设，否则任何人打开你的网址就能改配置
+      # 建议在 Render 控制台里手动填一个长随机串，或把 sync 改成 false 自己填
+      - key: ADMIN_TOKEN
+        sync: false
+      # 站点配置（控制台「保存到云端」会自动写这个变量；也可以自己粘贴 JSON）
+      - key: PROFILES_JSON
+        sync: false
